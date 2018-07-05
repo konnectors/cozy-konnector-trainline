@@ -4,12 +4,13 @@ const {
   log,
   BaseKonnector,
   saveBills,
-  request,
+  requestFactory,
   retry
 } = require('cozy-konnector-libs')
 const moment = require('moment')
-let rq = request({
-  // debug: true
+let rq = requestFactory({
+  // debug: true,
+  jar: true
 })
 
 // The goal of this connector is to fetch bills from the
