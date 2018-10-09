@@ -88,5 +88,6 @@
       }
     }
   },
-  "banksTransactionRegExp": "\\btrainline\\b"
+  "banksTransactionRegExp": "\\btrainline\\b",
+  "manifest_version": "2"
 }
