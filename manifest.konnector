@@ -1,5 +1,5 @@
 {
-  "version": "1.0.1",
+  "version": "1.1.0",
   "name": "Trainline",
   "type": "konnector",
   "language": "node",
@@ -88,5 +88,6 @@
       }
     }
   },
-  "banksTransactionRegExp": "\\btrainline\\b"
+  "banksTransactionRegExp": "\\btrainline\\b",
+  "manifest_version": "2"
 }
