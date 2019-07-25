@@ -3,7 +3,7 @@
   "name": "Trainline",
   "type": "konnector",
   "language": "node",
-  "icon": "trainline.svg",
+  "icon": "icon.svg",
   "slug": "trainline",
   "source": "git://github.com/konnectors/cozy-konnector-trainline.git",
   "editor": "Cozy",
