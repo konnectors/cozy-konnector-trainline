@@ -6,8 +6,7 @@ const {
   log,
   BaseKonnector,
   saveBills,
-  requestFactory,
-  retry
+  requestFactory
 } = require('cozy-konnector-libs')
 const moment = require('moment')
 let rq = requestFactory({
@@ -15,28 +14,35 @@ let rq = requestFactory({
   jar: true
 })
 
-// The goal of this connector is to fetch bills from the
-// service trainline.fr
-module.exports = new BaseKonnector(function fetch(fields) {
-  return login(fields)
-    .then(data =>
-      retry(fetchBills, {
-        interval: 3000,
-        throw_original: true,
-        args: [data]
-      })
-    )
-    .then(entries =>
-      saveBills(entries, fields.folderPath, {
-        timeout: Date.now() + 60 * 1000,
-        identifiers: 'trainline'
-      })
-    )
-})
-
 const baseUrl = 'https://www.trainline.eu/'
 
-function login(fields) {
+const timeout = Date.now() + 4 * 60 * 1000
+
+module.exports = new BaseKonnector(start)
+
+async function start(fields) {
+  await login(fields)
+
+  // the api/v5_1/pnrs uri gives all information necessary to get bill
+  // information
+  const body = await rq(`${baseUrl}api/v5_1/pnrs`)
+  let data = {}
+  // We check there are bills
+  if (body.proofs && body.proofs.length > 0) {
+    saveMetadata(data, body)
+    const entries = fetchBills(data)
+    await saveBills(entries, fields, {
+      identifiers: 'trainline',
+      sourceAccount: this.accountId,
+      sourceAccountIdentifier: fields.login,
+      linkBankOperations: false
+    })
+    data = {}
+    await getNextMetaData.bind(this)(computeNextDate(body.pnrs), data, fields)
+  }
+}
+
+async function login(fields) {
   // Signin form
   const signinForm = {
     concur_auth_code: null,
@@ -53,42 +59,26 @@ function login(fields) {
     user_itokend: null
   }
   // Signin
-  const signinPath = `${baseUrl}api/v5_1/account/signin`
-  return rq({
-    uri: signinPath,
-    method: 'POST',
+  const res = await rq.post(`${baseUrl}api/v5_1/account/signin`, {
     form: signinForm,
     resolveWithFullResponse: true,
     simple: false
-  }).then(res => {
-    log('info', 'Connected')
+  })
 
-    if (res.statusCode === 422) {
-      throw new Error('LOGIN_FAILED')
+  log('info', 'Connected')
+
+  if (res.statusCode === 422) {
+    throw new Error('LOGIN_FAILED')
+  }
+  log('info', 'Successfully logged in.')
+
+  // Retrieve token
+  const token = res.body.meta.token
+
+  rq = rq.defaults({
+    headers: {
+      Authorization: `Token token="${token}"`
     }
-    log('info', 'Successfully logged in.')
-
-    // Retrieve token
-    const token = res.body.meta.token
-
-    rq = rq.defaults({
-      headers: {
-        Authorization: `Token token="${token}"`
-      }
-    })
-
-    // the api/v5_1/pnrs uri gives all information necessary to get bill
-    // information
-    return rq(`${baseUrl}api/v5_1/pnrs`).then(body => {
-      const data = {}
-      // We check there are bills
-      if (body.proofs && body.proofs.length > 0) {
-        saveMetadata(data, body)
-        return getNextMetaData(computeNextDate(body.pnrs), data)
-      } else {
-        return data
-      }
-    })
   })
 }
 
@@ -111,15 +101,32 @@ function computeNextDate(pnrs) {
     .format('YYYY-MM-DD')
 }
 
-function getNextMetaData(startdate, data) {
-  return rq(`${baseUrl}api/v5_1/pnrs?date=${startdate}`).then(body => {
-    if (body.proofs && body.proofs.length > 0) {
-      saveMetadata(data, body)
-      return getNextMetaData(computeNextDate(body.pnrs), data)
-    } else {
-      return data
-    }
-  })
+async function getNextMetaData(startdate, data, fields) {
+  if (Date.now() >= timeout) {
+    log('warn', `timeout`)
+    return data
+  }
+
+  log('info', `getNextMetaData: ${startdate}`)
+  const body = await rq(`${baseUrl}api/v5_1/pnrs?date=${startdate}`)
+  if (body.proofs && body.proofs.length > 0) {
+    saveMetadata(data, body)
+    const entries = fetchBills(data)
+    await saveBills(entries, fields, {
+      identifiers: 'trainline',
+      sourceAccount: this.accountId,
+      sourceAccountIdentifier: fields.login,
+      linkBankOperations: false
+    })
+    data = {}
+    return await getNextMetaData.bind(this)(
+      computeNextDate(body.pnrs),
+      data,
+      fields
+    )
+  } else {
+    return data
+  }
 }
 
 function saveMetadata(data, body) {
