@@ -1,4 +1,6 @@
-'use strict'
+process.env.SENTRY_DSN =
+  process.env.SENTRY_DSN ||
+  'https://b5ed6a3c90834bfc87780b2bcc1f9ac1@sentry.cozycloud.cc/84'
 
 const {
   log,
