@@ -3,7 +3,6 @@ node_js:
 - '12'
 env:
   global:
-  - DEPLOY_REPOSITORY="git@github.com:konnectors/cozy-konnector-trainline.git"
   # REGISTRY_TOKEN(editor=cozy, app=trainline)
   - secure: Zrws2LKlidB15JxoceFit9C8XhCDarUlfY6SniSFrafMZKTPinTLlAuQ8vaPSBVvxMJNSYhiTSEq3XMq9PBasvq1WT1xZp5B0AAoq5ulUVcW2PIbGjzeE3Xo2sneLmPQDrcsvdY90BjWalgcG0UkIcFvdcMZFjgzhbqcVxxGTuN7IXia3PbRo50u+uVtMWcXH7HAR2YHyLqxkKS4+jpTJlGj0wDvQv5KC0UqxZnnR6hEG4vuZi2h4Pg2CFm6Svc028NqicYYr7KaVcSkbLeVXEm7be6q+DuF1nWiZiSGInlXoya0Lz3fj+OGG8vJVAne/2fkGEP+UAr+SEUbBiu3/gZ/JJXMUa10gVLznQ+Q6e34tA1Zy2AvLxcT/I2VhX2+G2jb/rXlotASrzh36XhWPKKCoUPk/p4aB2dnRGreoGz0+aR2AnifP5yQlpXwqZbuOEXEm2B3GuZIFOcu/USmu3PlNYe+VS9hoDM++XEz6jzqR7ylgAhEO12WEKBEj9GUA82xGghWkqs7w9LDtvh7lEkTWD4417iADqNX5EDuXhWXJO7w9aq4DjJ7tKR2nfetPUVy3ZnFebqCi8h+TUuUZQHfrDoLZyk71RYFBKUz01aGImIVmO502n7L67or7kNi3WRqZobs/mtGQrALY0gRMN5rFccTACI3ibve2fl0ROE=
   # MATTERMOST_HOOK_URL
