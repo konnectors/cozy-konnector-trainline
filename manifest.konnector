@@ -95,6 +95,9 @@
       }
     }
   },
+  "features": [
+    "METADATA_DEDUP"
+  ],
   "banksTransactionRegExp": "\\btrainline\\b",
   "manifest_version": "2"
 }
