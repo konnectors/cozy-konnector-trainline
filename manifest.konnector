@@ -7,7 +7,7 @@
   "slug": "trainline",
   "source": "git@github.com:konnectors/cozy-konnector-trainline.git",
   "editor": "Cozy",
-  "vendor_link": "www.trainline.fr",
+  "vendor_link": "https://www.trainline.fr",
   "categories": [
     "transport"
   ],
